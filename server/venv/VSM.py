@@ -185,14 +185,15 @@ def searchXML():
     measure="cosine" #cosine
     mode2=request.json['mode']
     query=request.json['query'] 
+    k=request.json['k']
     arr=[]
     t3=time.time()
     if(mode2=="xml"):
         root=ET.fromstring(query)
-        arr=similarityRankingTree(root,0.01,0.01,mode,measure)
+        arr=similarityRankingTree(root,0.01,0.01,mode,measure,int(k))
         t3=time.time()
     if (mode2=="paths"):
-        arr=similarityRankingStr(query,0.001,0.001)
+        arr=similarityRankingStr(query,0.001,0.001,int(k))
         t3=time.time()
     print(arr)
     return { 'arrDoc': arr, 'time': t3-t2, 'results': len(arr)}
@@ -406,7 +407,7 @@ def searchIndexMain(arr: array, threshold):
                     arrayDoc.append(arr1[j][0])
     return arrayDoc
 
-def similarityRankingTree(root,threshold_index,treshold_similarity, mode, measure):
+def similarityRankingTree(root,threshold_index,treshold_similarity, mode, measure,k):
     arrDocsSort=[]
     dictSort={}
     arr_values=[]
@@ -449,10 +450,16 @@ def similarityRankingTree(root,threshold_index,treshold_similarity, mode, measur
             if(dictSort[key]==arr_values_sort[i] and dictSort[key]>=treshold_similarity):
                 arrDocsSort.append(key)
                 dictSort[key]= 2
-    return arrDocsSort
-print(similarityRankingTree(getRoot(arrayDocs[0]),0.001,0.001,"TF", "cosine"))
+    arrTemp = []
+    if(len(arrDocsSort)<=k):
+        return arrDocsSort
+    else:
+        for i in range (k):
+            arrTemp.append(arrDocsSort[i])
+        return arrTemp
 
-def similarityRankingStr(str,threshold,treshold_similarity):
+
+def similarityRankingStr(str,threshold,treshold_similarity,k):
     str=str.lower()
     arr1=queryString(str)
     arr_values=[]
@@ -479,7 +486,13 @@ def similarityRankingStr(str,threshold,treshold_similarity):
             if(dictSort[key]==arr_values_sort[i] and dictSort[key]>=treshold_similarity):
                 arrDocsSort.append(key)
                 dictSort[key]= 2
-    return arrDocsSort
+    arrTemp = []
+    if(len(arrDocsSort)<=k):
+        return arrDocsSort
+    else:
+        for i in range (k):
+            arrTemp.append(arrDocsSort[i])
+        return arrTemp
 
 
 
