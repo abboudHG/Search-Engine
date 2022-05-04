@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS,cross_origin
 import time
 from indexingTables import indexingContent,indexingContentStructure,indexingStructure
-arrayDocs=["./XMLDOCS/D1.xml", "./XMLDOCS/D2.xml","./XMLDOCS/D3.xml","./XMLDOCS/D4.xml","./XMLDOCS/D5.xml","./XMLDOCS/D6.xml","./XMLDOCS/D7.xml" ]
+arrayDocs=["./XMLDOCS/D1.xml", "./XMLDOCS/D2.xml","./XMLDOCS/D3.xml","./XMLDOCS/D4.xml","./XMLDOCS/D5.xml","./XMLDOCS/D6.xml","./XMLDOCS/D7.xml" , "./XMLDOCS/D8.xml", "./XMLDOCS/D9.xml","./XMLDOCS/D10.xml","./XMLDOCS/D11.xml", "./XMLDOCS/D12.xml","./XMLDOCS/D13.xml","./XMLDOCS/D14.xml","./XMLDOCS/D15.xml","./XMLDOCS/D16.xml","./XMLDOCS/D17.xml","./XMLDOCS/D18.xml","./XMLDOCS/D19.xml","./XMLDOCS/D20.xml"]
 N=len(arrayDocs)
 app = Flask(__name__) 
 CORS(app)

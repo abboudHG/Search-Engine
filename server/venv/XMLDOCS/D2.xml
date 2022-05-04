@@ -1,17 +1,17 @@
-<a>
-<r>
-  <o>
-    <p>
-      <q></q>
-    </p>
-    <l>
-      <o>
-        <f></f>
-      </o>
-      <e>
-        <o></o>
-      </e>
-    </l>
-  </o>
-</r>
-</a>
+<planes_for_sale>
+   <ad>
+      <year> 1965 </year>
+      <make> p </make>
+      <model> Suzuki </model>
+      <color> Gold </color>
+      <description> 240 hours SMOH, dual NAVCOMs, DME, 
+                new Cleveland brakes, great shape </description>
+      <seller phone = "555-333-2222"  
+              email = "jseller@www.axl.com">
+              Abboud Hayek </seller>
+      <location>
+         <city> St. Joseph, </city>
+         <state> Missouri </state>
+      </location>
+   </ad>
+</planes_for_sale>

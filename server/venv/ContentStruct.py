@@ -18,7 +18,7 @@ CORS(app)
 tree=ET.parse("./XMLDOCS/D1.xml")
 root=tree.getroot()
 
-arrayDocs=["./XMLDOCS/D1.xml", "./XMLDOCS/D2.xml","./XMLDOCS/D3.xml","./XMLDOCS/D4.xml","./XMLDOCS/D5.xml","./XMLDOCS/D6.xml","./XMLDOCS/D7.xml" ]
+arrayDocs=["./XMLDOCS/D1.xml", "./XMLDOCS/D2.xml","./XMLDOCS/D3.xml","./XMLDOCS/D4.xml","./XMLDOCS/D5.xml","./XMLDOCS/D6.xml","./XMLDOCS/D7.xml" , "./XMLDOCS/D8.xml", "./XMLDOCS/D9.xml","./XMLDOCS/D10.xml","./XMLDOCS/D11.xml", "./XMLDOCS/D12.xml","./XMLDOCS/D13.xml","./XMLDOCS/D14.xml","./XMLDOCS/D15.xml","./XMLDOCS/D16.xml","./XMLDOCS/D17.xml","./XMLDOCS/D18.xml","./XMLDOCS/D19.xml","./XMLDOCS/D20.xml"]
 N=len(arrayDocs)
 
 @app.route('/contentStructure', methods=['POST', 'GET'])
@@ -30,7 +30,9 @@ def contentStructure():
     query=request.json[ 'query']
     if(mode2=="xml"):
         root=ET.fromstring(query)
+        print(root)
         arr=similarityRankingTree(root,0.01,0.01,"TF-IDF","cosine")
+        print(arr)
         t2=time.time()
     if(mode2=="keywords"):
         arr=similarityRankingStr(query,0.001,0.001)
@@ -62,18 +64,18 @@ def getArrayRoots(arr1):
         root=tree.getroot()
         arr.append(root)
     return arr
-def contextStructure(arr: ArrayType,sequence,root : ET.Element):
-    arr1 = [root.tag,sequence] 
+def contextStructure(arr: ArrayType,sequence,root : ET.Element, count):
+    arr1 = [root.tag.lower(),sequence,count] 
     arr.append(arr1)
-    sequence = sequence.__add__(root.tag + "/")
+    sequence = sequence.__add__(root.tag.lower() + "/")
     arr2=[]
     if(root.text != None):
         arr3=root.text.split()
         for i in range (len(arr3)):
-            arr2 = [arr3[i],sequence]
+            arr2 = [arr3[i].lower(),sequence,count+1]
             arr.append(arr2)
     for child in root:
-        contextStructure(arr,sequence,child)
+        contextStructure(arr,sequence,child, count+1)
     return arr
 
 
@@ -88,13 +90,15 @@ def pre(root:ET.Element):
     arr = []
     sequence = ""
     count = 0
-    return  preprocess(contextStructure(arr,sequence,root))
-
+    return  preprocess(contextStructure(arr,sequence,root,0))
 def TF(arr, arr1): # arr hiye l big array w  arr1 hiye one node maa l context
     count=0
     for i in range(len(arr)):
+
         if(arr[i]== arr1):
             count+=1
+    if(arr1[2]!=0):
+        count=float(count)*(1/(1+arr1[2]))
     return count
 
 def dict_TF(root):
@@ -108,13 +112,13 @@ def DF(nodeArr,arr1): # all docs we have is arr1
     count=0
     for i in range (len(arr1)):
         longDF= pre(arr1[i])
-        if(TF(longDF,nodeArr) >=1):
+        if(TF(longDF,nodeArr)!=0):
             count+=1
     return count
 
 
 def IDF(nodeArr):
-    return abs(math.log(N/DF(nodeArr,getArrayRoots(arrayDocs)),10))
+    return abs(math.log(N/(DF(nodeArr,getArrayRoots(arrayDocs))),10))*(1/(1+nodeArr[2]))
 
 def dict_IDF(root):
     arr=pre(root)
@@ -127,7 +131,8 @@ def dict_TF_IDF(root):
     arr=pre(root)
     dictTF_IDF={}
     for i in range (len(arr)): 
-        dictTF_IDF[arr[i][0] + ","+ arr[i][1]]=IDF(arr[i])*TF(arr,arr[i])
+        if(arr[i][2]!=0):
+            dictTF_IDF[arr[i][0] + ","+ arr[i][1]]=IDF(arr[i])*TF(arr,arr[i])*(1+arr[i][2])
     return dictTF_IDF
 
 def costUpdate(str1,str2):
@@ -282,7 +287,8 @@ def searchIndexMain(arr: array, threshold):
     dict=indexingContentStructure
     arr1=[]
     for i in range (len(arr)):
-        arr1=dict[str(arr[i][0])+","+str(arr[i][1])]
+        if(dict.__contains__(str(arr[i][0])+","+str(arr[i][1]))):
+             arr1=dict[str(arr[i][0])+","+str(arr[i][1])]
         for j in range (len(arr1)):
             if(arr1[j][1]>= threshold):
                 if(not arrayDoc.__contains__(arr1[j][0])):
@@ -305,6 +311,8 @@ def similarityRankingTree(root,threshold_index,treshold_similarity, mode, measur
    
     arr_values_sort=[]
     arrDoc=searchIndexMain(arr1,threshold_index)
+    if(len(arrDoc)==0):
+        return []
     for i in range(len(arrDoc)):
         if(mode=="TF"):
             dict2=dict_TF(getRoot(doc_XML(arrDoc[i])))
@@ -329,7 +337,9 @@ def similarityRankingTree(root,threshold_index,treshold_similarity, mode, measur
                 dictSort[key]= 2
     return arrDocsSort
 
+
 def similarityRankingStr(str1,threshold,treshold_similarity):
+    str1=str1.lower()
     arr1=queryString(str1)
     arr_values=[]
     arrDocsSort=[]
@@ -339,6 +349,8 @@ def similarityRankingStr(str1,threshold,treshold_similarity):
         dict1[str(arr1[i][0])+","+str(arr1[i][1])]=1
     arr_values_sort=[]
     arrDoc=searchIndexMain(arr1,threshold)
+    if(len(arrDoc)==0):
+        return []
     for i in range(len(arrDoc)):
         dict2=dict_TF_IDF(getRoot(doc_XML(arrDoc[i])))
         sim=cosine_sim(dict1,dict2)
@@ -355,10 +367,6 @@ def similarityRankingStr(str1,threshold,treshold_similarity):
                 dictSort[key]= 2
     return arrDocsSort
 
-
-
-print(queryString("Department"))
-print(similarityRankingStr("maria abboud chloe a b", 0.001,0.001))
 
 
 if __name__ =='__main__':

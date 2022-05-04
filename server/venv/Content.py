@@ -5,8 +5,9 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS,cross_origin
 import time
 from indexingTables import indexingContent
-arrayDocs=["./XMLDOCS/D1.xml", "./XMLDOCS/D2.xml","./XMLDOCS/D3.xml","./XMLDOCS/D4.xml","./XMLDOCS/D5.xml","./XMLDOCS/D6.xml","./XMLDOCS/D7.xml" ]
+arrayDocs=["./XMLDOCS/D1.xml", "./XMLDOCS/D2.xml","./XMLDOCS/D3.xml","./XMLDOCS/D4.xml","./XMLDOCS/D5.xml","./XMLDOCS/D6.xml","./XMLDOCS/D7.xml" , "./XMLDOCS/D8.xml", "./XMLDOCS/D9.xml","./XMLDOCS/D10.xml","./XMLDOCS/D11.xml", "./XMLDOCS/D12.xml","./XMLDOCS/D13.xml","./XMLDOCS/D14.xml","./XMLDOCS/D15.xml","./XMLDOCS/D16.xml","./XMLDOCS/D17.xml","./XMLDOCS/D18.xml","./XMLDOCS/D19.xml","./XMLDOCS/D20.xml"]
 N=len(arrayDocs)
+historyDict={}
 app = Flask(__name__) 
 CORS(app)
 @app.route('/content', methods=[ 'POST', 'GET'])
@@ -14,16 +15,19 @@ def content():
     t1=time.time()
     t2=time.time()
     arr=[]
+    strNew=""
     mode2=request.json['mode']
     query=request.json[ 'query']
     if(mode2=="xml"):
         root=ET.fromstring(query)
-        arr=similarityRankingTree(root,0.01,0.01,"TF-IDF","cosine")
+        arr=similarityRankingTree(root,0.01,0.01,"TF-IDF","euclidian")
         t2=time.time()
     if(mode2=="keywords"):
         arr=similarityRankingStr(query,0.001,0.001)
         t2=time.time()
-    return {'arrDoc': arr, 'time': t2-t1, 'results': len(arr)}
+    if(len(arr)==0):
+        strNew=choose_Do_You_Mean(query)
+    return {'arrDoc': arr, 'time': t2-t1, 'results': len(arr),'word': strNew}
 
 
 
@@ -39,17 +43,28 @@ def getArrayRoots(arr1):
     arr=[]
     for i in range(len(arr1)):
         tree=ET.parse(arr1[i])
+        
         root=tree.getroot()
         arr.append(root)
     return arr
 
 
-def contentProcess(root : ET.Element,arr):
-
-    if(root.text != None):
+def contentProcess (root : ET.Element,arr):
+    
+    str1=",.?!&#$%*^@)("
+    arrStrings=['i','and', 'or','not', 'is', 'are', 'you', 'your', 'it', 'he', 'she', 'her', 'his', 'them', 'to', 'the','a','an','of', 'in', 'on', 'at','for', 'me','him','our', 'their', 'too']
+    if(root.text != None ):
         arr3=root.text.split()
+        arr2 =[]
         for i in range (len(arr3)):
-            arr.append(arr3[i])
+            if(not arrStrings.__contains__(arr3[i]) and not str1.__contains__(arr3[i])):
+                 arr2.append(arr3[i].lower())
+                 arr.append(arr3[i].lower())
+        for i in range (len(arr2)): 
+            c=arr2[i]
+            for j in range (i+1,len(arr2)):
+                c += " " + arr2[j]
+                arr.append(c)
     for child in root:
         contentProcess(child,arr)
     return arr
@@ -175,6 +190,7 @@ def index_structure(arr):  #nte5oud aprintrray_unique
                 arrfinal.append(arrayDocj)
         dict_index_structure[arraykeys[i]]=arrfinal
     return dict_index_structure
+
 def doc_XML(str):
     str="./XMLDOCS/"+str+".xml"
     return str
@@ -184,14 +200,24 @@ def queryTree(root):
     return arr
 
 def queryString(str:str):
-    arr=str.split()
+    arr=[]
+    if (str[0]=='"' and str[-1]=='"'):
+        arr = [str[1:len(str)-1]]
+    elif (str.__contains__("&")):
+        arr2 = str.split("&")
+        arr = ["&"]
+        arr.append(arr2)
+    else:
+        arr = str.split()
     return arr
+
 def searchIndexMain(arr: array, threshold):
     arrayDoc=[]
     dict=indexingContent
     arr1=[]
     for i in range (len(arr)):
-        arr1=dict[arr[i]]
+        if(dict.__contains__(arr[i])):
+            arr1=dict[arr[i]]
         for j in range (len(arr1)):
             if(arr1[j][1]>= threshold):
                 if(not arrayDoc.__contains__(arr1[j][0])):
@@ -214,6 +240,7 @@ def similarityRankingTree(root,threshold_index,treshold_similarity, mode, measur
    
     arr_values_sort=[]
     arrDoc=searchIndexMain(arr1,threshold_index)
+   
     sim=0
     for i in range(len(arrDoc)):
         if(mode=="TF"):
@@ -239,9 +266,13 @@ def similarityRankingTree(root,threshold_index,treshold_similarity, mode, measur
             if(dictSort[key]==arr_values_sort[i] and dictSort[key]>=treshold_similarity):
                 arrDocsSort.append(key)
                 dictSort[key]= 2
+    historyDict[root]=arrDocsSort
     return arrDocsSort
     
 def similarityRankingStr(str,threshold,treshold_similarity):
+    str=str.lower()
+    if(historyDict.__contains__(str)):
+        return historyDict[str]
     arr1=queryString(str)
     arr_values=[]
     arrDocsSort=[]
@@ -251,6 +282,8 @@ def similarityRankingStr(str,threshold,treshold_similarity):
         dict1[arr1[i]]=1
     arr_values_sort=[]
     arrDoc=searchIndexMain(arr1,threshold)
+    if(len(arrDoc)==0):
+        return []
     for i in range(len(arrDoc)):
         dict2=dict_TF(getRoot(doc_XML(arrDoc[i])))
         sim=cosine_measure(dict1,dict2)
@@ -265,11 +298,52 @@ def similarityRankingStr(str,threshold,treshold_similarity):
             if(dictSort[key]==arr_values_sort[i] and dictSort[key]>=treshold_similarity):
                 arrDocsSort.append(key)
                 dictSort[key]= 2
+    historyDict[str]=arrDocsSort
     return arrDocsSort
 
+def costUpdate(char1,char2):
+    if(char1==char2):
+        return 0
+    else: return 1
+
+def Wegner_Fisher(str1 :str, str2 : str):
+    len1 = len(str1)
+    len2 = len(str2)
+    dist=[[0 for x in range (len2+1)] for y in range (len1+1)]
+    dist[0][0]=0
+    for i in range (1,len1+1):
+        dist[i][0] = dist[i-1][0]+1
+    for j in range (1,len2+1):
+        dist[0][j] = dist[0][j-1]+1
+    for i in range (1,len1+1):
+        for j in range (1,len2+1):
+            a=dist[i-1][j-1]+costUpdate(str1[i-1], str2[j-1])
+            b=dist[i-1][j]+1
+            c=dist[i][j-1]+1
+            dist[i][j]= min(a,b,c)
+  
+    return dist[len1][len2]
+
+ #first one row, second one column
+
+def choose_Do_You_Mean(str1 :str):
+    minimum=100
+    str_to_choose=""
+    for key in indexingContent:
+        num = Wegner_Fisher(str1,key)
+       # print("num = "+ str(num))
+        if(num < minimum and num<3):
+            
+            minimum=num
+           # print("minimum = "+str(minimum))
+            str_to_choose=key
+           # print("key is: "+str(key))
+    return str_to_choose
 
 
 
+
+        
 
 
 

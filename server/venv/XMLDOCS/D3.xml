@@ -1,28 +1,6 @@
-<a>
-    <b>
-    <c>
-        <o> </o>
-        <d></d>
-    </c>
-    </b>
-    <e>
-        <v> </v>
-        <w>
-            <p></p>
-            <p></p>
-            <chloe></chloe>
-        </w>
-    </e>
-    <maria>
-    maria
-        <abboud></abboud>
-    </maria>
-    <e>
-        <v></v>
-        <w>
-         <abboud></abboud>
-          <abboud></abboud>
-            <p></p>
-        </w>
-    </e>
-</a>
+<note>
+<to>Tove</to>
+<from>Jani</from>
+<heading>Reminder</heading>
+<body>Don't forget me this weekend!</body>
+</note>

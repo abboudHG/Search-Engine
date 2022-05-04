@@ -13,7 +13,7 @@ app = Flask(__name__)
 CORS(app)
 source=0
 destination=0
-arrayDocs=["./XMLDOCS/D1.xml", "./XMLDOCS/D2.xml","./XMLDOCS/D3.xml","./XMLDOCS/D4.xml","./XMLDOCS/D5.xml","./XMLDOCS/D6.xml","./XMLDOCS/D7.xml" ]
+arrayDocs=["./XMLDOCS/D1.xml", "./XMLDOCS/D2.xml","./XMLDOCS/D3.xml","./XMLDOCS/D4.xml","./XMLDOCS/D5.xml","./XMLDOCS/D6.xml","./XMLDOCS/D7.xml" , "./XMLDOCS/D8.xml", "./XMLDOCS/D9.xml","./XMLDOCS/D10.xml","./XMLDOCS/D11.xml", "./XMLDOCS/D12.xml","./XMLDOCS/D13.xml","./XMLDOCS/D14.xml","./XMLDOCS/D15.xml","./XMLDOCS/D16.xml","./XMLDOCS/D17.xml","./XMLDOCS/D18.xml","./XMLDOCS/D19.xml","./XMLDOCS/D20.xml"]
 N=len(arrayDocs)
 @app.route("/VSM",methods=['POST'])
 def computeVSM():
@@ -34,6 +34,36 @@ def computeVSM():
         doc1=arrayDocs[3]
     elif source== "Document 5":
         doc1= arrayDocs[4]
+    elif source== "Document 6":
+        doc1= arrayDocs[5]
+    elif source== "Document 7":
+        doc1= arrayDocs[6]
+    elif source== "Document 8":
+        doc1= arrayDocs[7]
+    elif source== "Document 9":
+        doc1= arrayDocs[8]
+    elif source== "Document 10":
+        doc1= arrayDocs[9]
+    elif source== "Document 11":
+        doc1= arrayDocs[10]
+    elif source== "Document 12":
+        doc1= arrayDocs[11]
+    elif source== "Document 13":
+        doc1= arrayDocs[12]
+    elif source== "Document 14":
+        doc1= arrayDocs[13]
+    elif source== "Document 15":
+        doc1= arrayDocs[14]
+    elif source== "Document 16":
+        doc1= arrayDocs[15]
+    elif source== "Document 17":
+        doc1= arrayDocs[16]
+    elif source== "Document 18":
+        doc1= arrayDocs[17]
+    elif source== "Document 19":
+        doc1= arrayDocs[18]
+    elif source== "Document 20":
+        doc1= arrayDocs[19]
     
     #destination
     if destination=="Document 1":
@@ -46,6 +76,36 @@ def computeVSM():
         doc2=arrayDocs[3]
     elif destination== "Document 5":
         doc2= arrayDocs[4]
+    elif destination== "Document 6":
+       doc2= arrayDocs[5]
+    elif destination== "Document 7":
+        doc2= arrayDocs[6]
+    elif destination== "Document 8":
+        doc2= arrayDocs[7]
+    elif destination== "Document 9":
+        doc2= arrayDocs[8]
+    elif destination== "Document 10":
+        doc2= arrayDocs[9]
+    elif destination== "Document 11":
+        doc2= arrayDocs[10]
+    elif destination== "Document 12":
+        doc2= arrayDocs[11]
+    elif destination== "Document 13":
+        doc2= arrayDocs[12]
+    elif destination== "Document 14":
+       doc2= arrayDocs[13]
+    elif destination== "Document 15":
+        doc2= arrayDocs[14]
+    elif destination== "Document 16":
+        doc2= arrayDocs[15]
+    elif destination== "Document 17":
+        doc2= arrayDocs[16]
+    elif destination== "Document 18":
+        doc2= arrayDocs[17]
+    elif destination== "Document 19":
+        doc2= arrayDocs[18]
+    elif destination== "Document 20":
+       doc2= arrayDocs[19]
 
     root1=getRoot(doc1)
     root2=getRoot(doc2)
@@ -69,9 +129,7 @@ def computeVSM():
         if(measure=="euclidian"):
             sim=euclidian_measure(dict1,dict2)
             t1 = time.time()
-        if(measure=="pearson"):
-            sim=pearson(dict1,dict2)
-            t1 = time.time()
+        
       
     if(mode=="IDF"):
         dict1=dict_IDF(root1)
@@ -87,9 +145,7 @@ def computeVSM():
         if(measure=="euclidian"):
             sim=euclidian_measure(dict1,dict2)
             t1 = time.time()
-        if(measure=="pearson"):
-            sim=pearson(dict1,dict2)
-            t1 = time.time()
+      
 
     if(mode=="TF-IDF"):
         dict1=dict_TF_IDF(root1)
@@ -105,9 +161,7 @@ def computeVSM():
         if(measure=="euclidian"):
             sim=euclidian_measure(dict1,dict2)
             t1 = time.time()
-        if(measure=="pearson"):
-            sim=pearson(dict1,dict2)
-            t1 = time.time()
+        
    
     
     return {'VSM':sim,'timeVSM':t1-t0}
@@ -164,14 +218,14 @@ def countChild(root):
 def preorder(root):
     if root is None:
         return []
-    ans= [root.tag]
+    ans= [root.tag.lower()]
     for x in root:
         ans += preorder(x)
     return ans
 def preprocessArr(root: ET.Element,sequence : str , arr,count ):
     count = count +1
     seq = sequence
-    seq = seq.__add__(root.tag + "/")
+    seq = seq.__add__(root.tag.lower() + "/")
     arr.append(seq)
     # if(countChild(root)==0):
     #  arr.append(seq)
@@ -282,36 +336,6 @@ def euclidian_measure(dict3,dict4):
     denominator=1+den2
     return numerator/denominator
 
-
-
-def pearson(dict3,dict4):
-    dict1_sum=0
-    count=0
-   
-    for key in dict3:
-        dict1_sum+=(float(dict3[key]))
-        count+=1
-    dict1_avg=dict1_sum/count
-    dict2_sum=0
-    count2=0
-    for key in dict4:
-        dict2_sum+=(float(dict4[key]))
-        count2+=1
-    dict2_avg=dict2_sum/count2
-    dict2=extend_dict(dict3,dict4)
-    dict1=extend_dict(dict4,dict3)
-    num=0
-    for key in dict1:
-        num+=(float(dict1.__getitem__(key))-dict1_avg)*(float(dict2.__getitem__(key))-dict2_avg)
-    numerator=num
-    den=0
-    for key in dict1:
-        den+=((float(dict1.__getitem__(key))-dict1_avg)**2)*((float(dict2.__getitem__(key))-dict2_avg)**2)
-    denominator=math.sqrt(den)
-   
-    return numerator/denominator
-
-
 def AllPath_AllDocuments(arr):
     #arr=[]
     arrfinal = [0 for i in range(len(arr))]
@@ -374,7 +398,8 @@ def searchIndexMain(arr: array, threshold):
     dict=indexingStructure
     arr1=[]
     for i in range (len(arr)):
-        arr1=dict[arr[i]]
+        if(dict.__contains__(arr[i])):
+              arr1=dict[arr[i]]
         for j in range (len(arr1)):
             if(arr1[j][1]>= threshold):
                 if(not arrayDoc.__contains__(arr1[j][0])):
@@ -397,6 +422,8 @@ def similarityRankingTree(root,threshold_index,treshold_similarity, mode, measur
    
     arr_values_sort=[]
     arrDoc=searchIndexMain(arr1,threshold_index)
+    if(len(arrDoc)==0):
+        return []
     sim=0
     for i in range(len(arrDoc)):
         if(mode=="TF"):
@@ -426,6 +453,7 @@ def similarityRankingTree(root,threshold_index,treshold_similarity, mode, measur
 print(similarityRankingTree(getRoot(arrayDocs[0]),0.001,0.001,"TF", "cosine"))
 
 def similarityRankingStr(str,threshold,treshold_similarity):
+    str=str.lower()
     arr1=queryString(str)
     arr_values=[]
     arrDocsSort=[]
@@ -435,6 +463,8 @@ def similarityRankingStr(str,threshold,treshold_similarity):
         dict1[arr1[i]]=1
     arr_values_sort=[]
     arrDoc=searchIndexMain(arr1,threshold)
+    if(len(arrDoc)==0):
+        return []
     for i in range(len(arrDoc)):
         dict2=dict_TF(getRoot(doc_XML(arrDoc[i])))
         sim=cosine_measure(dict1,dict2)
@@ -451,12 +481,6 @@ def similarityRankingStr(str,threshold,treshold_similarity):
                 dictSort[key]= 2
     return arrDocsSort
 
-dict111={"a":1, "b":1, "a/b":1}
-dictdoc1=dict_TF(getRoot(arrayDocs[0]))
-dictdoc4=dict_TF(getRoot(arrayDocs[3]))
-print(cosine_measure(dict111,dictdoc1))
-print(cosine_measure(dict111,dictdoc4))
-print (similarityRankingStr("a b a/b",0.389,0.2))
 
 
 

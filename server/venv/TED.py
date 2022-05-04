@@ -6,7 +6,7 @@ import time
 app = Flask(__name__) 
 CORS(app)
 
-arrayDocs=["./XMLDOCS/D1.xml", "./XMLDOCS/D2.xml","./XMLDOCS/D3.xml","./XMLDOCS/D4.xml","./XMLDOCS/D5.xml"]
+arrayDocs=["./XMLDOCS/D1.xml", "./XMLDOCS/D2.xml","./XMLDOCS/D3.xml","./XMLDOCS/D4.xml","./XMLDOCS/D5.xml","./XMLDOCS/D6.xml","./XMLDOCS/D7.xml" , "./XMLDOCS/D8.xml", "./XMLDOCS/D9.xml","./XMLDOCS/D10.xml","./XMLDOCS/D11.xml", "./XMLDOCS/D12.xml","./XMLDOCS/D13.xml","./XMLDOCS/D14.xml","./XMLDOCS/D15.xml","./XMLDOCS/D16.xml","./XMLDOCS/D17.xml","./XMLDOCS/D18.xml","./XMLDOCS/D19.xml","./XMLDOCS/D20.xml"]
 
 
 @app.route('/TED',methods=['POST'])
@@ -28,6 +28,36 @@ def getTED():
         doc1=arrayDocs[3]
     elif source== "Document 5":
         doc1= arrayDocs[4]
+    elif source== "Document 6":
+        doc1= arrayDocs[5]
+    elif source== "Document 7":
+        doc1= arrayDocs[6]
+    elif source== "Document 8":
+        doc1= arrayDocs[7]
+    elif source== "Document 9":
+        doc1= arrayDocs[8]
+    elif source== "Document 10":
+        doc1= arrayDocs[9]
+    elif source== "Document 11":
+        doc1= arrayDocs[10]
+    elif source== "Document 12":
+        doc1= arrayDocs[11]
+    elif source== "Document 13":
+        doc1= arrayDocs[12]
+    elif source== "Document 14":
+        doc1= arrayDocs[13]
+    elif source== "Document 15":
+        doc1= arrayDocs[14]
+    elif source== "Document 16":
+        doc1= arrayDocs[15]
+    elif source== "Document 17":
+        doc1= arrayDocs[16]
+    elif source== "Document 18":
+        doc1= arrayDocs[17]
+    elif source== "Document 19":
+        doc1= arrayDocs[18]
+    elif source== "Document 20":
+        doc1= arrayDocs[19]
     
     #destination
     if destination=="Document 1":
@@ -40,7 +70,37 @@ def getTED():
         doc2=arrayDocs[3]
     elif destination== "Document 5":
         doc2= arrayDocs[4]
-    
+    elif destination== "Document 6":
+       doc2= arrayDocs[5]
+    elif destination== "Document 7":
+        doc2= arrayDocs[6]
+    elif destination== "Document 8":
+        doc2= arrayDocs[7]
+    elif destination== "Document 9":
+        doc2= arrayDocs[8]
+    elif destination== "Document 10":
+        doc2= arrayDocs[9]
+    elif destination== "Document 11":
+        doc2= arrayDocs[10]
+    elif destination== "Document 12":
+        doc2= arrayDocs[11]
+    elif destination== "Document 13":
+        doc2= arrayDocs[12]
+    elif destination== "Document 14":
+       doc2= arrayDocs[13]
+    elif destination== "Document 15":
+        doc2= arrayDocs[14]
+    elif destination== "Document 16":
+        doc2= arrayDocs[15]
+    elif destination== "Document 17":
+        doc2= arrayDocs[16]
+    elif destination== "Document 18":
+        doc2= arrayDocs[17]
+    elif destination== "Document 19":
+        doc2= arrayDocs[18]
+    elif destination== "Document 20":
+       doc2= arrayDocs[19]
+
 
     root1=getRoot(doc1)
     root2=getRoot(doc2)

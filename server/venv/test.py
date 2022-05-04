@@ -1,3 +1,2 @@
-arra=[10,3,1]
-arra.sort()
-print(arra)
+strrr="'Chloe'"
+print (strrr[1:len(strrr)-1])
